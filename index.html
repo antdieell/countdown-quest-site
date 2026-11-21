@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deadline Quest</title>
+<meta name="description" content="Turn your goal into a pixel adventure: a live countdown map in your browser that you can save as a still lock-screen wallpaper for your phone.">
+<meta name="theme-color" content="#0d1230">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Deadline Quest">
+<meta property="og:description" content="Turn your goal into a pixel adventure: a live countdown map you can save as your phone's lock screen.">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="masthead">
+    <p class="eyebrow">Turn your goal into a pixel adventure</p>
+    <h1>Deadline Quest</h1>
+    <p class="lede">Set a goal and its milestones, pick your traveler, and save the map as your lock screen.</p>
+  </header>
+  <noscript><p class="lede">Deadline Quest needs JavaScript to draw the map.</p></noscript>
+
+  <main class="layout">
+    <!-- Phone preview -->
+    <section class="stage" aria-label="Wallpaper preview">
+      <div class="phone" id="phone" data-device="iphone">
+        <div class="screen" id="screen">
+          <canvas id="scene" aria-label="Animated quest map. Tap a signboard to inspect a milestone; drag to scroll a taller map."></canvas>
+          <button type="button" class="recenter" id="recenter" hidden>Find traveler</button>
+
+          <div class="lock" id="lock" hidden aria-hidden="true">
+            <div class="lock-status">
+              <span class="lock-carrier">Quest LTE</span>
+              <span class="lock-island"></span>
+              <span class="lock-batt"><i></i>87%</span>
+            </div>
+            <div class="lock-date" id="lockDate">Monday, November 16</div>
+            <div class="lock-time" id="lockTime">9:41</div>
+            <div class="lock-widgets">
+              <span class="w-ring"><b>72°</b></span>
+              <span class="w-ring"><b>8k</b></span>
+              <span class="w-rect"><small>Up next</small>Standup · 10:00</span>
+            </div>
+            <div class="lock-bottom">
+              <span class="lock-btn" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M9 2h6v5l-2 3v12h-2V10L9 7z"/></svg>
+              </span>
+              <span class="lock-btn" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 7h3l2-3h6l2 3h3v13H4zm8 3a4 4 0 100 8 4 4 0 000-8z"/></svg>
+              </span>
+            </div>
+            <div class="lock-home"></div>
+          </div>
+        </div>
+      </div>
+      <p class="stage-hint">Tap a signboard to inspect a milestone. With extra islands, drag the map to look around.</p>
+    </section>
+
+    <!-- Controls -->
+    <section class="panel" aria-label="Quest controls">
+      <div class="countdown" aria-live="polite">
+        <p class="label">Final castle</p>
+        <h2 id="goalTitle">Build My Own House</h2>
+        <div class="clock" id="clock">
+          <div><b id="cdD">--</b><span>days</span></div>
+          <div><b id="cdH">--</b><span>hrs</span></div>
+          <div><b id="cdM">--</b><span>min</span></div>
+          <div><b id="cdS">--</b><span>sec</span></div>
+        </div>
+        <p class="sub" id="goalDate">Target: Dec 31, 2026</p>
+        <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+        <p class="sub" id="progressText">1 of 5 milestones cleared</p>
+      </div>
+
+      <div class="controls">
+        <div class="seg" role="radiogroup" aria-label="Phone size">
+          <button type="button" id="devIphone" role="radio" aria-checked="true" data-device="iphone">iPhone<small>1170×2532</small></button>
+          <button type="button" id="devAndroid" role="radio" aria-checked="false" data-device="android">Android<small>1080×1920</small></button>
+        </div>
+        <label class="switch" for="lockToggle">
+          <input type="checkbox" id="lockToggle">
+          <span class="track"><span class="knob"></span></span>
+          <span>Lock-screen preview</span>
+        </label>
+      </div>
+
+      <div class="roster">
+        <p class="label">Traveler</p>
+        <div class="traveler">
+          <img id="travelerImg" alt="" width="72" height="72">
+          <div class="traveler-fields">
+            <label class="pick-field"><span>Person</span>
+              <select id="selSex"><option value="m">Male</option><option value="f">Female</option></select>
+            </label>
+            <label class="pick-field"><span>Species</span>
+              <select id="selSpecies"></select>
+            </label>
+          </div>
+        </div>
+        <p class="label" id="hairLabel">Hair color</p>
+        <div class="swatches" id="hairSwatches" role="radiogroup" aria-labelledby="hairLabel"></div>
+        <p class="hair-note" id="hairNote" hidden></p>
+        <p class="label" id="skinLabel">Skin tone</p>
+        <div class="swatches" id="skinSwatches" role="radiogroup" aria-labelledby="skinLabel"></div>
+        <p class="hair-note" id="skinNote" hidden></p>
+      </div>
+
+      <div class="dl-row">
+        <button type="button" class="download" id="downloadBtn">
+          <span class="dl-main">Download wallpaper</span>
+          <span class="dl-sub" id="downloadSize">Still PNG · 1170×2532</span>
+        </button>
+        <button type="button" class="howto-link" id="howtoLink" aria-controls="howto"><b>?</b>How it works</button>
+      </div>
+      <div class="app-wall" id="appWall" hidden>
+        <p class="label" id="wallLabel">Phone wallpaper</p>
+        <div class="seg" id="wallTarget" role="radiogroup" aria-labelledby="wallLabel">
+          <button type="button" role="radio" aria-checked="true" data-target="lock">Lock screen</button>
+          <button type="button" role="radio" aria-checked="false" data-target="home">Home screen</button>
+          <button type="button" role="radio" aria-checked="false" data-target="both">Both</button>
+        </div>
+        <button type="button" class="set-wall" id="setWallBtn">Set as wallpaper now</button>
+        <label class="switch" for="autoWall">
+          <input type="checkbox" id="autoWall">
+          <span class="track"><span class="knob"></span></span>
+          <span>Update the day count every day</span>
+        </label>
+        <p class="hint" id="autoStatus" role="status"></p>
+      </div>
+      <p class="toast" id="toast" role="status"></p>
+
+      <div class="milestones">
+        <div class="ms-head">
+          <h3>Milestones</h3>
+          <button type="button" class="link" id="resetBtn">Reset to defaults</button>
+        </div>
+        <ol class="ms-list" id="msList"></ol>
+        <button type="button" class="add-island" id="addBtn">+ Add an island before the Crystal Shrine</button>
+      </div>
+
+      <section class="howto" id="howto" aria-labelledby="howtoTitle">
+        <div class="howto-head">
+          <h3 id="howtoTitle" tabindex="-1">How to use your wallpaper</h3>
+          <span class="badge">Manual wallpaper updates</span>
+        </div>
+        <p class="howto-lead">The download is a <b>still picture</b> of the map. It shows the countdown as of the moment you saved it, and it will not tick, animate or update on its own. The live countdown, moving water, drifting clouds, waterfalls, chimney smoke, glowing crystal and castle, your traveler's activity and the overdue storms all live here on this page.</p>
+        <p class="howto-lead web-only">To refresh the day count on your lock screen, save a new picture and set it again. Nothing here changes your phone's wallpaper by itself, and automatic daily updates are not built in.</p>
+        <p class="howto-lead android-app-only">In the Android app, <b>Set as wallpaper now</b> puts the picture on your lock screen, home screen or both. Turn on <b>Update the day count every day</b> and the app keeps a picture ready for each of the next 3 weeks; your phone switches to the right one shortly after midnight, even when the app is closed. Opening the app extends the 3 weeks. The picture itself is still a still image: the live animation stays in the app.</p>
+
+        <div class="tabs" role="tablist" aria-label="Wallpaper guide">
+          <button type="button" role="tab" id="tab-iphone" aria-controls="pane-iphone" aria-selected="true">iPhone</button>
+          <button type="button" role="tab" id="tab-android" aria-controls="pane-android" aria-selected="false" tabindex="-1">Android</button>
+          <button type="button" role="tab" id="tab-compare" aria-controls="pane-compare" aria-selected="false" tabindex="-1">What works where</button>
+        </div>
+
+        <div class="pane" id="pane-iphone" role="tabpanel" aria-labelledby="tab-iphone">
+          <h4>Set it by hand <small>works on every iPhone</small></h4>
+          <ol class="steps">
+            <li>Tap <b>Download wallpaper</b> above. The share sheet opens; tap <b>Save Image</b>. The picture is now in Photos.</li>
+            <li>Open <b>Settings → Wallpaper → Add New Wallpaper → Photos</b> and choose the picture. Leave it unzoomed: the countdown sits beside the castle, below the clock.</li>
+            <li>Tap <b>Add</b>, then <b>Set as Wallpaper Pair</b> (or <b>Customize Home Screen</b> if you want a different home screen).</li>
+          </ol>
+          <p class="hint">To update the day count later, repeat these three steps. It takes about half a minute.</p>
+
+          <h4>Two-tap updates with a Shortcut <small>optional · iOS 17 or later</small></h4>
+          <p>Apple's Shortcuts app can swap the photo of a wallpaper for you. Make this shortcut once; afterwards an update is: tap Download wallpaper, tap the shortcut.</p>
+          <ol class="steps">
+            <li>Do "Set it by hand" once, so your iPhone has a photo wallpaper the shortcut can change.</li>
+            <li>Open the <b>Shortcuts</b> app and tap <b>+</b> to make a new shortcut.</li>
+            <li>Tap the <b>ⓘ</b> info button at the bottom and turn on <b>Show in Share Sheet</b>. Under <b>Share Sheet Types</b> keep <b>Images</b> only, then go back.</li>
+            <li>Tap <b>Add Action</b>, search for <b>Set Wallpaper Photo</b> and add it. Set its photo to <b>Shortcut Input</b> and pick the wallpaper it should change (the one from step 1). Turn off <b>Show Preview</b> so it applies without asking.</li>
+            <li>Name the shortcut <b>Set quest wallpaper</b> and tap <b>Done</b>.</li>
+          </ol>
+          <p class="hint">From now on: in Deadline Quest tap <b>Download wallpaper</b>, then in the share sheet tap <b>Set quest wallpaper</b> (scroll the row of apps if it's hidden). Your lock screen shows today's count.</p>
+
+          <details class="more">
+            <summary>Optional: a daily reminder, or an automation that applies your newest saved picture</summary>
+            <p><b>Daily reminder.</b> In Shortcuts open <b>Automation → + → Time of Day</b>, pick a time such as 7:00 and <b>Daily</b>, choose <b>Run Immediately</b>, then add the action <b>Open URLs</b> with this page's address:</p>
+            <div class="url-row"><code id="pageUrl">…</code><button type="button" class="copy" id="copyUrl">Copy</button></div>
+            <p>Each morning your iPhone opens Deadline Quest; two taps later the lock screen is current.</p>
+            <p><b>Apply the newest picture on a schedule.</b> If you would rather save pictures and have them applied later: when you download, choose <b>Save to Files</b> and pick the <b>Shortcuts</b> folder in iCloud Drive (make a <b>Deadline Quest</b> folder inside it the first time). Then make a Time of Day automation with these actions: <b>Get Contents of Folder</b> (Deadline Quest) → <b>Filter Files</b> (sort by Last Modified Date, latest first, limit 1) → <b>Set Wallpaper Photo</b>. The automation sets whatever picture you saved last. It cannot draw a new one, so the count is as of the time you saved it.</p>
+          </details>
+
+          <div class="verify">
+            <b>Not yet verified on a real iPhone.</b> These Shortcuts steps follow Apple's documented actions, but the Deadline Quest team has not run the full flow on a device yet, and button names differ a little between iOS versions. If a step doesn't match what you see, "Set it by hand" always works.
+          </div>
+
+          <h4>Why isn't it automatic?</h4>
+          <ul class="why">
+            <li>The picture is drawn in your browser from milestones that are stored only on your phone. Shortcuts can't run this page on a schedule to draw a fresh one, and its "Get Contents of URL" action can only fetch a file that already exists somewhere.</li>
+            <li>Adding Deadline Quest to your Home Screen (<b>Share → Add to Home Screen</b>) makes it open like an app, but iPhone gives web apps no permission to change the wallpaper. Only Settings and the Shortcuts "Set Wallpaper Photo" action can.</li>
+            <li>A fully automatic version would need a server that redraws your wallpaper every day, which means hosting and an account. That isn't built, so we don't claim it.</li>
+          </ul>
+        </div>
+
+        <div class="pane" id="pane-android" role="tabpanel" aria-labelledby="tab-android" hidden>
+          <div class="android-app-only">
+            <h4>In this app <small>Android 7 or later</small></h4>
+            <ol class="steps">
+              <li>Pick <b>Lock screen</b>, <b>Home screen</b> or <b>Both</b> under <b>Phone wallpaper</b>, then tap <b>Set as wallpaper now</b>.</li>
+              <li>For a daily update, turn on <b>Update the day count every day</b>. When you complete a milestone or change anything, the pictures are redrawn and today's goes up straight away.</li>
+              <li>Open the app at least once every 3 weeks so it can draw the next ones. If it hasn't been opened in that time, the last picture stays up.</li>
+            </ol>
+            <p class="hint">Some phones (Samsung, Xiaomi and others) pause background apps to save battery. If the count stops changing overnight, set Deadline Quest's battery use to <b>Unrestricted</b> in Settings → Apps.</p>
+            <div class="verify"><b>Daily updates are new.</b> They have been tested on an Android emulator, not yet on a real phone. If your lock screen doesn't change after midnight, tap Set as wallpaper now and tell us your phone model.</div>
+          </div>
+          <h4 class="web-only">Set it by hand</h4>
+          <ol class="steps web-only">
+            <li>Tap <b>Download wallpaper</b> above. Depending on your browser the PNG lands in <b>Downloads</b>, or the share sheet opens: choose <b>Save</b> or your Photos app.</li>
+            <li>Open the picture in <b>Google Photos</b> or <b>Files</b>, tap <b>⋮ → Use as → Wallpaper</b> (Samsung: <b>Set as wallpaper</b>), choose <b>Lock screen</b> and tap <b>Set</b>. Or long-press your home screen → <b>Wallpaper &amp; style</b> → pick a photo.</li>
+            <li>To update the day count later, repeat steps 1 and 2.</li>
+          </ol>
+          <p class="hint web-only">The Android export is 1080×1920 (9:16). Taller screens crop a little at the top and bottom; the clock zone in the sky stays clear.</p>
+          <p class="hint web-only">Android has no built-in equivalent of Apple Shortcuts for wallpapers. Automation apps such as MacroDroid or Tasker can set a wallpaper from a folder on a schedule; we haven't tested them, and they still need you to save a fresh picture first.</p>
+        </div>
+
+        <div class="pane" id="pane-compare" role="tabpanel" aria-labelledby="tab-compare" hidden>
+          <div class="cmp-wrap">
+            <table class="cmp">
+              <thead><tr><th scope="col">Feature</th><th scope="col">This page</th><th scope="col">Downloaded wallpaper</th><th scope="col">With a Shortcut set up</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Countdown ticks (days · hrs · min · sec)</th><td class="yes" data-col="This page"><i>✓</i>Yes</td><td class="no" data-col="Downloaded wallpaper"><i>✕</i>Frozen at save time</td><td class="no" data-col="With a Shortcut set up"><i>✕</i>Frozen at save time</td></tr>
+                <tr><th scope="row">Day count is current</th><td class="yes" data-col="This page"><i>✓</i>Always</td><td class="part" data-col="Downloaded wallpaper"><i>◐</i>Only on the day you saved it</td><td class="part" data-col="With a Shortcut set up"><i>◐</i>As of your newest saved picture</td></tr>
+                <tr><th scope="row">Water, clouds, waterfalls and chimney smoke move</th><td class="yes" data-col="This page"><i>✓</i>Yes</td><td class="no" data-col="Downloaded wallpaper"><i>✕</i>Still</td><td class="no" data-col="With a Shortcut set up"><i>✕</i>Still</td></tr>
+                <tr><th scope="row">Crystal and castle glow, traveler's activity, storms</th><td class="yes" data-col="This page"><i>✓</i>Animated</td><td class="part" data-col="Downloaded wallpaper"><i>◐</i>Painted still</td><td class="part" data-col="With a Shortcut set up"><i>◐</i>Painted still</td></tr>
+                <tr><th scope="row">Shows on your lock screen</th><td class="no" data-col="This page"><i>✕</i>No</td><td class="yes" data-col="Downloaded wallpaper"><i>✓</i>Yes</td><td class="yes" data-col="With a Shortcut set up"><i>✓</i>Yes</td></tr>
+                <tr><th scope="row">Updating takes</th><td class="yes" data-col="This page"><i>✓</i>Nothing, just open it</td><td class="part" data-col="Downloaded wallpaper"><i>◐</i>Save, then set in Settings (about 30 s)</td><td class="part" data-col="With a Shortcut set up"><i>◐</i>Save, then 1 tap; or the automation applies it</td></tr>
+                <tr><th scope="row">Changes your wallpaper by itself</th><td class="no" data-col="This page"><i>✕</i>No</td><td class="no" data-col="Downloaded wallpaper"><i>✕</i>No</td><td class="no" data-col="With a Shortcut set up"><i>✕</i>No, it needs a picture you saved</td></tr>
+                <tr><th scope="row">Verified by us</th><td class="yes" data-col="This page"><i>✓</i>Tested in browsers</td><td class="yes" data-col="Downloaded wallpaper"><i>✓</i>Saved and set on a real iPhone</td><td class="part" data-col="With a Shortcut set up"><i>◐</i>From Apple's docs, not device-tested yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="hint">Legend: <span class="yes">✓ works</span> · <span class="part">◐ partly</span> · <span class="no">✕ no</span></p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="foot">
+    Handshake AI Skills Studio × Google · November 2026 Challenge.
+    Your milestones stay in this browser.
+  </footer>
+</div>
+<div class="save-sheet" id="saveSheet" role="dialog" aria-modal="true" aria-labelledby="saveTitle" hidden>
+  <div class="save-head">
+    <div>
+      <h2 id="saveTitle">Your wallpaper</h2>
+      <p id="saveHint">Press and hold the image, then choose <b>Save to Photos</b>. On a computer, right-click and choose <b>Save image as</b>. <span id="saveSize"></span></p>
+      <p class="save-warn" id="saveWarn" hidden>This preview runs inside another page, which can block saving. If nothing works here, open Deadline Quest directly in Safari or Chrome.</p>
+    </div>
+    <div class="save-actions">
+      <button type="button" class="save-share" id="saveShare" hidden>Share / Save to Photos</button>
+      <button type="button" class="save-close" id="saveClose">Done</button>
+    </div>
+  </div>
+  <img id="saveImg" alt="Exported Deadline Quest wallpaper">
+</div>
+<script src="app.js"></script>
+</body>
+</html>
