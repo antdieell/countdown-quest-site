@@ -34,6 +34,8 @@
         <div class="screen" id="screen">
           <canvas id="scene" aria-label="Animated quest map. Tap a signboard to inspect a milestone; drag to scroll a taller map."></canvas>
           <button type="button" class="recenter" id="recenter" hidden>Find traveler</button>
+          <div class="map-status" id="mapStatus" role="status"><span id="mapStatusText">Loading map…</span>
+            <button type="button" id="mapRetry" hidden>Try again</button></div>
 
           <div class="lock" id="lock" hidden aria-hidden="true">
             <div class="lock-status">

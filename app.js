@@ -170,11 +170,15 @@
     } catch (_) {}
   }
 
-  function loadImage(src) {
+  // Retries twice on a shaky connection (a fresh URL each time so a failed response isn't reused).
+  function loadImage(src, tries = 3) {
     return new Promise((res, rej) => {
       const im = new Image();
       im.onload = () => res(im);
-      im.onerror = () => rej(new Error('Could not load ' + src));
+      im.onerror = () => {
+        if (tries <= 1) return rej(new Error('Could not load ' + src));
+        setTimeout(() => loadImage(src.split('?')[0] + '?r=' + tries, tries - 1).then(res, rej), tries === 3 ? 600 : 1500);
+      };
       im.src = src;
     });
   }
@@ -2262,8 +2266,14 @@
 
   loadAssets()
     .then(() => Promise.race([fonts, fontTimeout]))
-    .then(() => { buildLiveMap(); buildPieces(); buildWorld(); snapHero(); ready = true; resizeCanvas(); renderPreview(); })
-    .catch(err => { toast(err.message + '. Check that the assets folder sits next to index.html.', true); });
+    .then(() => { buildLiveMap(); buildPieces(); buildWorld(); snapHero(); ready = true; resizeCanvas(); renderPreview();
+      $('mapStatus').hidden = true; })
+    .catch(err => {
+      console.error(err);
+      $('mapStatusText').textContent = "The map didn't finish loading. Check your connection.";
+      $('mapRetry').hidden = false;
+    });
+  $('mapRetry').addEventListener('click', () => location.reload());
 
   // Fonts may finish after the race timeout; redraw once they do.
   fonts.then(requestRender);
