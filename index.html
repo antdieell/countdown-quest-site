@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Deadline Quest</title>
+<title>Countdown Quest</title>
 <meta name="description" content="Turn your goal into a pixel adventure: a live countdown map in your browser that you can save as a still lock-screen wallpaper for your phone.">
 <meta name="theme-color" content="#0d1230">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Deadline Quest">
+<meta property="og:title" content="Countdown Quest">
 <meta property="og:description" content="Turn your goal into a pixel adventure: a live countdown map you can save as your phone's lock screen.">
 <meta property="og:image" content="https://antdieell.github.io/deadline-quest-site/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -22,10 +22,10 @@
 <div class="app">
   <header class="masthead">
     <p class="eyebrow">Turn your goal into a pixel adventure</p>
-    <h1>Deadline Quest</h1>
+    <h1><span class="app-name">Countdown Quest</span></h1>
     <p class="lede">Set a goal and its milestones, pick your traveler, and save the map as your lock screen.</p>
   </header>
-  <noscript><p class="lede">Deadline Quest needs JavaScript to draw the map.</p></noscript>
+  <noscript><p class="lede">Countdown Quest needs JavaScript to draw the map.</p></noscript>
 
   <main class="layout">
     <!-- Phone preview -->
@@ -180,24 +180,24 @@
             <li>Tap <b>Add Action</b>, search for <b>Set Wallpaper Photo</b> and add it. Set its photo to <b>Shortcut Input</b> and pick the wallpaper it should change (the one from step 1). Turn off <b>Show Preview</b> so it applies without asking.</li>
             <li>Name the shortcut <b>Set quest wallpaper</b> and tap <b>Done</b>.</li>
           </ol>
-          <p class="hint">From now on: in Deadline Quest tap <b>Download wallpaper</b>, then in the share sheet tap <b>Set quest wallpaper</b> (scroll the row of apps if it's hidden). Your lock screen shows today's count.</p>
+          <p class="hint">From now on: in <span class="app-name">Countdown Quest</span> tap <b>Download wallpaper</b>, then in the share sheet tap <b>Set quest wallpaper</b> (scroll the row of apps if it's hidden). Your lock screen shows today's count.</p>
 
           <details class="more">
             <summary>Optional: a daily reminder, or an automation that applies your newest saved picture</summary>
             <p><b>Daily reminder.</b> In Shortcuts open <b>Automation → + → Time of Day</b>, pick a time such as 7:00 and <b>Daily</b>, choose <b>Run Immediately</b>, then add the action <b>Open URLs</b> with this page's address:</p>
             <div class="url-row"><code id="pageUrl">…</code><button type="button" class="copy" id="copyUrl">Copy</button></div>
-            <p>Each morning your iPhone opens Deadline Quest; two taps later the lock screen is current.</p>
-            <p><b>Apply the newest picture on a schedule.</b> If you would rather save pictures and have them applied later: when you download, choose <b>Save to Files</b> and pick the <b>Shortcuts</b> folder in iCloud Drive (make a <b>Deadline Quest</b> folder inside it the first time). Then make a Time of Day automation with these actions: <b>Get Contents of Folder</b> (Deadline Quest) → <b>Filter Files</b> (sort by Last Modified Date, latest first, limit 1) → <b>Set Wallpaper Photo</b>. The automation sets whatever picture you saved last. It cannot draw a new one, so the count is as of the time you saved it.</p>
+            <p>Each morning your iPhone opens <span class="app-name">Countdown Quest</span>; two taps later the lock screen is current.</p>
+            <p><b>Apply the newest picture on a schedule.</b> If you would rather save pictures and have them applied later: when you download, choose <b>Save to Files</b> and pick the <b>Shortcuts</b> folder in iCloud Drive (make a <b><span class="app-name">Countdown Quest</span></b> folder inside it the first time). Then make a Time of Day automation with these actions: <b>Get Contents of Folder</b> (Deadline Quest) → <b>Filter Files</b> (sort by Last Modified Date, latest first, limit 1) → <b>Set Wallpaper Photo</b>. The automation sets whatever picture you saved last. It cannot draw a new one, so the count is as of the time you saved it.</p>
           </details>
 
           <div class="verify">
-            <b>Not yet verified on a real iPhone.</b> These Shortcuts steps follow Apple's documented actions, but the Deadline Quest team has not run the full flow on a device yet, and button names differ a little between iOS versions. If a step doesn't match what you see, "Set it by hand" always works.
+            <b>Not yet verified on a real iPhone.</b> These Shortcuts steps follow Apple's documented actions, but the <span class="app-name">Countdown Quest</span> team has not run the full flow on a device yet, and button names differ a little between iOS versions. If a step doesn't match what you see, "Set it by hand" always works.
           </div>
 
           <h4>Why isn't it automatic?</h4>
           <ul class="why">
             <li>The picture is drawn in your browser from milestones that are stored only on your phone. Shortcuts can't run this page on a schedule to draw a fresh one, and its "Get Contents of URL" action can only fetch a file that already exists somewhere.</li>
-            <li>Adding Deadline Quest to your Home Screen (<b>Share → Add to Home Screen</b>) makes it open like an app, but iPhone gives web apps no permission to change the wallpaper. Only Settings and the Shortcuts "Set Wallpaper Photo" action can.</li>
+            <li>Adding <span class="app-name">Countdown Quest</span> to your Home Screen (<b>Share → Add to Home Screen</b>) makes it open like an app, but iPhone gives web apps no permission to change the wallpaper. Only Settings and the Shortcuts "Set Wallpaper Photo" action can.</li>
             <li>A fully automatic version would need a server that redraws your wallpaper every day, which means hosting and an account. That isn't built, so we don't claim it.</li>
           </ul>
         </div>
@@ -255,14 +255,14 @@
     <div>
       <h2 id="saveTitle">Your wallpaper</h2>
       <p id="saveHint">Press and hold the image, then choose <b>Save to Photos</b>. On a computer, right-click and choose <b>Save image as</b>. <span id="saveSize"></span></p>
-      <p class="save-warn" id="saveWarn" hidden>This preview runs inside another page, which can block saving. If nothing works here, open Deadline Quest directly in Safari or Chrome.</p>
+      <p class="save-warn" id="saveWarn" hidden>This preview runs inside another page, which can block saving. If nothing works here, open <span class="app-name">Countdown Quest</span> directly in Safari or Chrome.</p>
     </div>
     <div class="save-actions">
       <button type="button" class="save-share" id="saveShare" hidden>Share / Save to Photos</button>
       <button type="button" class="save-close" id="saveClose">Done</button>
     </div>
   </div>
-  <img id="saveImg" alt="Exported Deadline Quest wallpaper">
+  <img id="saveImg" alt="Exported Countdown Quest wallpaper">
 </div>
 <script src="app.js"></script>
 </body>

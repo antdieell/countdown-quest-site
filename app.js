@@ -1,4 +1,4 @@
-/* Deadline Quest — countdown map engine, milestone manager and wallpaper exporter. */
+/* Countdown Quest (web) / Deadline Quest (apps) — countdown map engine, milestone manager and wallpaper exporter. */
 (() => {
   'use strict';
 
@@ -15,6 +15,7 @@
   const NATIVE = CAP && CAP.isNativePlatform && CAP.isNativePlatform() && window.capacitorExports
     ? window.capacitorExports.registerPlugin('Wallpaper') : null;
   const APP_OS = NATIVE ? CAP.getPlatform() : '';                 // 'android' | 'ios' | ''
+  const APP_NAME = NATIVE ? 'Deadline Quest' : 'Countdown Quest';      // the website and the phone apps go by different names
 
   // Traveler roster. Frames live at assets/sprites/<prefix>-0..3.png (idle, walk 1, walk 2, victory),
   // all built by tools/key_heroes.py on a 360x360 canvas with the feet at y = 350.
@@ -291,7 +292,7 @@
     let data, island = null;
     if (landLayer) island = landLayer.getContext('2d').getImageData(0, WATER_TOP, MAP_W, h).data;
     try { data = x.getImageData(0, 0, MAP_W, h); }
-    catch (_) { console.warn('Deadline Quest: serve over http(s) to enable the ocean shimmer and PNG export.'); return; }
+    catch (_) { console.warn(APP_NAME + ': serve over http(s) to enable the ocean shimmer and PNG export.'); return; }
     const d = data.data;
     for (let i = 0; i < d.length; i += 4) {
       const water = isSea(d[i], d[i + 1], d[i + 2]) && !(island && island[i + 3] > 10);
@@ -2023,7 +2024,7 @@
     try { blob = await new Promise(res => c.toBlob(res, 'image/png')); }
     catch (_) { blob = null; }
     if (!blob) throw new Error('The browser blocked the export. Open the page from a web server (http or https), not as a local file.');
-    const name = `deadline-quest-${state.device}-${d.w}x${d.h}.png`;
+    const name = `${APP_NAME.toLowerCase().replace(' ', '-')}-${state.device}-${d.w}x${d.h}.png`;
     // Embedded viewers (iframes) block downloads and sharing: show the image so it can be saved by hand.
     let framed = false;
     try { framed = window.self !== window.top; } catch (_) { framed = true; }
@@ -2033,7 +2034,7 @@
     try { canShare = !!(navigator.canShare && navigator.canShare({ files: [file] })); } catch (_) { canShare = false; }
     if (framed) { showSaveSheet(c.toDataURL('image/png'), d, canShare ? file : null, true); return ''; }
     if (touch && canShare) {
-      try { await navigator.share({ files: [file], title: 'Deadline Quest wallpaper' }); return 'Wallpaper ready. Choose "Save Image" to add it to Photos.'; }
+      try { await navigator.share({ files: [file], title: APP_NAME + ' wallpaper' }); return 'Wallpaper ready. Choose "Save Image" to add it to Photos.'; }
       catch (e) { if (e.name === 'AbortError') return ''; }
     }
     // Phones: link downloads are unreliable (Safari may open the image instead or ask), so show the picture with a
@@ -2055,7 +2056,7 @@
     $('saveSize').textContent = `${d.w}×${d.h} · ${d.label}`;
     $('saveShare').hidden = !file;
     $('saveWarn').hidden = !framed;
-    $('saveWarn').textContent = 'This preview runs inside another page, which can block saving. If nothing works here, open Deadline Quest directly in Safari or Chrome.';
+    $('saveWarn').textContent = `This preview runs inside another page, which can block saving. If nothing works here, open ${APP_NAME} directly in Safari or Chrome.`;
     sheet.hidden = false;
     (file ? $('saveShare') : $('saveClose')).focus();
   }
@@ -2063,11 +2064,11 @@
   // user-gesture rule is always met.
   $('saveShare').addEventListener('click', async () => {
     if (!shareFile) return;
-    try { await navigator.share({ files: [shareFile], title: 'Deadline Quest wallpaper' }); }
+    try { await navigator.share({ files: [shareFile], title: APP_NAME + ' wallpaper' }); }
     catch (e) {
       if (e.name === 'AbortError') return;
       $('saveWarn').hidden = false;
-      $('saveWarn').textContent = `Sharing is blocked here (${e.name}). Press and hold the image and choose Save to Photos, or open Deadline Quest directly in Safari or Chrome.`;
+      $('saveWarn').textContent = `Sharing is blocked here (${e.name}). Press and hold the image and choose Save to Photos, or open ${APP_NAME} directly in Safari or Chrome.`;
     }
   });
   $('saveClose').addEventListener('click', () => { $('saveSheet').hidden = true; $('saveImg').removeAttribute('src'); shareFile = null; $('downloadBtn').focus(); });
@@ -2251,6 +2252,7 @@
   // ----------------------------------------------------------------- boot
   applyDevice();
   applyLock();
+  if (NATIVE) { document.title = APP_NAME; document.querySelectorAll('.app-name').forEach(e => { e.textContent = APP_NAME; }); }
   renderRoster();
   renderList();
   updateCountdown();

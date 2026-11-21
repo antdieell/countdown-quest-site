@@ -1,4 +1,4 @@
-# Deadline Quest
+# Countdown Quest
 
 Turn your goal into a pixel adventure. Set a goal and its milestones, pick a traveler, and watch them journey across
 floating islands toward the castle while a live countdown ticks. Save the map as a still lock-screen wallpaper for
